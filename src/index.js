@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 import Autosuggest from 'react-autosuggest';
+
 
 const getSuggestionValue = suggestion => suggestion.vesselName;
 
 // Use your imagination to render suggestions.
 const renderSuggestion = suggestion => (
-  <div>
-    Vessel Name:{suggestion.VesselName}<p>{suggestion.cfr}</p>
+  <div id = "app">
+    Vessel Name:{suggestion.VesselName}<p>{suggestion.cfr} Country Code: {suggestion.CountryCode} &nbsp;
+     Loa: {suggestion.Loa} &nbsp; Event Code: {suggestion.EventCode} &nbsp; Event End Date: {suggestion.EventEndDate}</p>
   </div>
 );
 
@@ -40,13 +40,15 @@ class Example extends React.Component {
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested = ({ value }) => {
     axios
-      .post('http://10.11.1.70:9200/allvessels/allevents/_search', {
-          "query": {
-            "match": {
-              "VesselName.edgengram": value
-            }
+      .post('http://10.11.1.70:9200/allvessels/allevents/_search', 
+      {
+        "size":50,
+        "query": {
+          "match": {"VesselName.edgengram": value}
           }
-      })
+      
+      }
+      )
       .then(res => {
         const results = res.data.hits.hits.map(h => h._source)
         this.setState({ suggestions: results })
